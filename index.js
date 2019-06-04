@@ -29,7 +29,7 @@ io.on('connection', function (socket) {
     io.emit('chanel_messages', message);
   })
 
-  socket.on('chanel_list_users', function (user) {
+  socket.on('chanel_add_users', function (user) {
     usersConnected.push(user);
 
     const userFiltered = usersConnected.reduce((acc, current) => {
@@ -40,14 +40,21 @@ io.on('connection', function (socket) {
         return acc;
       }
     }, []);
+    io.emit('chanel_add_users', userFiltered);
+  })
 
-    io.emit('chanel_list_users', userFiltered);
+  socket.on('chanel_remove_user', function(user) {
+    console.log('usersConnected', usersConnected)
+    const userFiltered = usersConnected.filter(item => item.user !== user.user);
+    console.log('userFiltered', userFiltered)
+    io.emit('chanel_remove_user', userFiltered);
   })
 
 
-  // socket.on('chat_detail', function(message) {
-  //   console.log('message detail', message)
-  // })
+  socket.on('chat_detail', function(obj) {
+    io.emit('chat_detail', obj);
+    console.log('obj detail', obj)
+  })
 });
 
 http.listen(3000, function () {

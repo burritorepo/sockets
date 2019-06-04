@@ -23,10 +23,10 @@ function storage() {
   }
 }
 
-function submitFormMessage(cb = () => {}) {
+function submitFormMessage(cb = () => { }) {
   const form = document.querySelector('form');
   const input = document.querySelector('input');
-  form.onsubmit = function(e) {
+  form.onsubmit = function (e) {
     e.preventDefault();
     cb(input.value)
     input.value = '';
@@ -50,7 +50,16 @@ function socketWatch(channel, cb) {
   socket.on(`${channel}`, cb)
 }
 
-
 function socketEmit(channel, value) {
   socket.emit(`${channel}`, value)
+}
+
+function logout(cb = () => {}) {
+  const button  = document.querySelector('.js_logout');
+
+  button.onclick = function(e) {
+    console.log('click logout!!')
+    e.preventDefault();
+    cb()
+  }
 }

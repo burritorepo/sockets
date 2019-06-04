@@ -43,6 +43,14 @@
         })
       });
       socketWatch('chat_detail', htmlMessages);
+
+      logout(() => {
+        socketEmit('chanel_remove_user', {
+          from: storage().get('user'),
+          message
+        })
+        socketWatch('chanel_remove_user', htmlListUser);
+      })      
     }
 
     init();

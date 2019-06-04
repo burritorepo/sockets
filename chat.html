@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Chat</title>
-  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="http://localhost:3000/styles/main.css">
 </head>
 
 <body>
@@ -15,6 +15,7 @@
       <div class="user-list">
         <header class="js_user_total user-list__header">
           <h2>Conectados</h2>
+          <div></div>
         </header>
         <div class="js_user_list user-list__wrapper">
         </div>
@@ -23,7 +24,7 @@
     <div class="wrap-chat__item wrap-chat__right">
       <header>
         <h1>Codigo chat</h1>
-        <a href="/">Salir</a>
+        <a class="js_logout" href="/">Salir</a>
       </header>
       <main>
         <div class="js_currentUser">
@@ -53,15 +54,17 @@
     function htmlListUser(users) {
       let total = 0;
       const container = document.querySelector('.js_user_list');
-      const containerTotal = document.querySelector('.js_user_total');
+      const containerTotal = document.querySelector('.js_user_total div');
       container.innerHTML = '';
+      containerTotal.innerHTML = '';
 
       users.
         filter(current => current.user !== storage().get('user'))
         .map((current) => {
-          total +=1;
+          total += 1;
           const userElement = document.createElement('a');
-          userElement.href = `/chat/${current.user}`
+          userElement.href = `/chat/${current.user}`;
+          userElement.id = `${current.user}`;
           userElement.classList.add('user-list__user');
           userElement.innerHTML = `
           <div class="user-list__name">${current.user}</div>
@@ -77,20 +80,32 @@
     }
 
     function init() {
+      const totalMessages = [];
       wellComeUser();
 
-      socketEmit('chanel_list_users', {
+      socketEmit('chanel_add_users', {
         user: storage().get('user')
       });
-      socketWatch('chanel_list_users', htmlListUser);
+      socketWatch('chanel_add_users', htmlListUser);
 
       submitFormMessage((message) => {
-        socket.emit('chanel_messages', {
+        socketEmit('chanel_messages', {
           from: storage().get('user'),
           message
         })
       });
       socketWatch('chanel_messages', htmlMessages);
+
+      logout(() => {
+        console.log('logout!!')
+        socketEmit('chanel_remove_user', {
+          user: storage().get('user')
+        })
+      })  
+      socketWatch('chanel_remove_user', (users) => {
+        htmlListUser(users);
+        document.location.href = '/';
+      });    
     }
 
     (storage().get('user')) ? init() : document.location.href = '/';
