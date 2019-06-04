@@ -6,99 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Agregar usuario</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: arial;
-      font-size: 13px;
-    }
-
-    input {
-      padding: 10px;
-    }
-
-    input[type="text"] {
-      min-width: 300px;
-    }
-
-    .form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      vertical-align: middle;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    .form-row {
-      margin: 0 0 20px;
-    }
-
-    .form-row label,
-    .form-row input {
-      display: block;
-    }
-
-    .form-row label {
-      margin: 0 0 10px;
-    }
-
-    .form-row input {
-      width: 100%;
-    }
-
-    .text-center {
-      text-align: center;
-    }
-
-    .button {
-      background: red;
-      padding: 10px;
-      border: 0;
-      color: white;
-      cursor: pointer;
-      min-width: 120px;
-    }
-
-    footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
-
-    footer input {
-      width: 100%;
-      min-height: 80px;
-    }
-
-    header {
-      padding: 20px;
-      background: red;
-      color: white;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="./styles/main.css">
 </head>
 
-<body>
-  <form class="form">
-    <div class="form-row">
-      <label class="text-center">Nickname</label>
-      <input type="text" required />
-    </div>
-    <div class="form-row text-center">
-      <button class="button">Ingresar</button>
-    </div>
-  </form>
-
+<body class="pag-intro">
+  <div class="box">
+    <h1 class="text-center">CHAT - SOCKET</h1>
+    <form class="form">
+      <div class="form-row">
+        <label class="text-center">Ingresa tu Nick</label>
+        <input class="fx" type="text" required />
+      </div>
+      <div class="form-row text-center">
+        <button class="button">Ingresar</button>
+      </div>
+    </form>
+  </div>
   <script>
-
     const input = document.querySelector('input');
-
     function clearSession() {
       sessionStorage.clear();
       input.value = '';
@@ -107,7 +32,6 @@
     function getUser() {
       const form = document.querySelector('form');
       const button = document.querySelector('button');
-      
 
       form.addEventListener('submit', function (e) {
         e.preventDefault();

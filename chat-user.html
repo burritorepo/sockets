@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Chat</title>
+  <link rel="stylesheet" href="http://localhost:3000/styles/main.css">
+</head>
+
+<body class="pag-user">
+  <div class="wrap-chat">
+    <div class="wrap-chat__item wrap-chat__right">
+      <header>
+        <h1>Codigo chat</h1>
+        <a href="/">Salir</a>
+      </header>
+      <main>
+        <div class="js_currentUser">
+        </div>
+        <div class="js_messages"></div>
+      </main>
+      <footer>
+        <form>
+          <input type="text">
+        </form>
+      </footer>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="http://localhost:3000/scripts/main.js"></script>
+  <script>
+    const socket = io();
+    function init() {
+      const hrefArray = location.href.split('/')
+      const to = hrefArray[hrefArray.length - 1]
+      submitFormMessage((message) => {
+        socket.emit('chat_detail', {
+          from: storage().get('user'),
+          to,
+          message
+        })
+      });
+      socketWatch('chat_detail', htmlMessages);
+    }
+
+    init();
+  </script>
+</body>
+
+</html>

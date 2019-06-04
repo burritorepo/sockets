@@ -6,200 +6,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Chat</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: arial;
-      font-size: 13px;
-    }
-
-    input {
-      padding: 10px;
-    }
-
-    input[type="text"] {
-      min-width: 300px;
-    }
-
-    .form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      vertical-align: middle;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    .form-row {
-      margin: 0 0 20px;
-    }
-
-    .form-row label,
-    .form-row input {
-      display: block;
-    }
-
-    .form-row label {
-      margin: 0 0 10px;
-    }
-
-    .form-row input {
-      width: 100%;
-    }
-
-    .text-center {
-      text-align: center;
-    }
-
-    .button {
-      background: red;
-      padding: 10px;
-      border: 0;
-      color: white;
-      cursor: pointer;
-      min-width: 120px;
-    }
-
-    footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
-
-    footer input {
-      width: 100%;
-      min-height: 80px;
-    }
-
-    header {
-      padding: 20px;
-      background: red;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header a {
-      cursor: pointer;
-      color: white;
-      text-decoration: none;
-    }
-
-    main {
-      padding: 20px;
-    }
-
-    .alert {
-      padding: 20px 10px;
-      border: 1px solid #c5b9b9;
-      border-radius: 8px;
-      /* display: inline-block; */
-      background: #ddf5fc;
-      font-weight: bold;
-      color: #676767;
-      font-size: 16px;
-    }
-
-
-    .wrapp-message {
-      margin-top: 20px;
-    }
-
-    .wrapp-message .client {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .message {
-      
-      border: 1px solid #66ff87;
-      padding: 10px;
-      border-radius: 10px;
-      display: inline-block;
-      background: #effff8;
-    }
-  </style>
+  <link rel="stylesheet" href="./styles/main.css">
 </head>
 
 <body>
-
-  <header>
-    <h1>Chat</h1>
-    <a href="/">Salir</a>
-  </header>
-  <main>
-    <div class="js_currentUser">
+  <div class="wrap-chat">
+    <div class="wrap-chat__item wrap-chat__left">
+      <div class="user-list">
+        <header class="js_user_total user-list__header">
+          <h2>Conectados</h2>
+        </header>
+        <div class="js_user_list user-list__wrapper">
+        </div>
+      </div>
     </div>
-    <div class="js_messages"></div>
-  </main>
-  <footer>
-    <form>
-      <input type="text">
-    </form>
-  </footer>
+    <div class="wrap-chat__item wrap-chat__right">
+      <header>
+        <h1>Codigo chat</h1>
+        <a href="/">Salir</a>
+      </header>
+      <main>
+        <div class="js_currentUser">
+        </div>
+        <div class="js_messages"></div>
+      </main>
+      <footer>
+        <form>
+          <input type="text">
+        </form>
+      </footer>
+    </div>
+  </div>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="http://localhost:3000/scripts/main.js"></script>
   <script>
     const socket = io();
-
     function wellComeUser() {
-      const user = sessionStorage.getItem('user');
-      const div = document.createElement('div');
-      div.classList.add('alert')
       const container = document.querySelector('.js_currentUser');
+      const div = document.createElement('div');
+      div.classList.add('alert');
 
-      div.textContent = `Bienvenido ${user}`;
+      div.textContent = `Bienvenido ${storage().get('user')}`;
       container.appendChild(div);
     }
 
-    wellComeUser();
+    function htmlListUser(users) {
+      let total = 0;
+      const container = document.querySelector('.js_user_list');
+      const containerTotal = document.querySelector('.js_user_total');
+      container.innerHTML = '';
 
-    function sendMessage() {
-      const form = document.querySelector('form');
-      const input = document.querySelector('input');
-      const client = sessionStorage.getItem('user');
-
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        socket.emit('canalCliente', {
-          client,
-          message: input.value
+      users.
+        filter(current => current.user !== storage().get('user'))
+        .map((current) => {
+          total +=1;
+          const userElement = document.createElement('a');
+          userElement.href = `/chat/${current.user}`
+          userElement.classList.add('user-list__user');
+          userElement.innerHTML = `
+          <div class="user-list__name">${current.user}</div>
+          <span class="user-list__status"></span>
+        `
+          container.appendChild(userElement);
         });
-        input.value = ''
-      })
+
+      const htmlTotal = document.createElement('span');
+      htmlTotal.classList.add('total');
+      htmlTotal.innerHTML = `${total}`;
+      containerTotal.appendChild(htmlTotal);
     }
 
-    function htmlMessages(obj) {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('wrapp-message');
-      wrapper.innerHTML = `
-      <div class="client">${obj.client} dice:</div>
-      <div class="message">${obj.message}</div>
-      `
-      // const message = document.createElement('div');
-      const container = document.querySelector('.js_messages')
-      // message.classList.add('message');
+    function init() {
+      wellComeUser();
 
-      // message.textContent = `${obj.client} dice: ${obj.message}`;
-      // wrapper.appendChild(message);
-      // container.appendChild(message)
+      socketEmit('chanel_list_users', {
+        user: storage().get('user')
+      });
+      socketWatch('chanel_list_users', htmlListUser);
 
-      container.appendChild(wrapper)
+      submitFormMessage((message) => {
+        socket.emit('chanel_messages', {
+          from: storage().get('user'),
+          message
+        })
+      });
+      socketWatch('chanel_messages', htmlMessages);
     }
 
-    function listening() {
-      socket.on('canalServer', function (obj) {
-        htmlMessages(obj);
-      })
-    }
-
-    sendMessage();
-    listening();
+    (storage().get('user')) ? init() : document.location.href = '/';
   </script>
 </body>
 
